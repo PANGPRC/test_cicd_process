@@ -1,5 +1,5 @@
 # 使用官方的OpenJDK基础镜像
-FROM openjdk:11-jre-slim
+FROM openjdk:8-jre-slim
 
 # 设置工作目录
 WORKDIR /app
