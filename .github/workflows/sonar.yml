@@ -27,7 +27,7 @@ jobs:
         with:
           host: ${{ secrets.K8S_NODE_IP }}
           username: ${{ secrets.K8S_NODE_USER }}
-          key: ${{ secrets.K8S_NODE_SSH_KEY }}
+          password: ${{ secrets.K8S_NODE_PASSWORD }}
           script: |
             docker run --rm \
               -e SONAR_HOST_URL=http://localhost:9000 \
@@ -39,4 +39,3 @@ jobs:
                 -Dsonar.sources=/usr/src \
                 -Dsonar.host.url=$SONAR_HOST_URL \
                 -Dsonar.login=$SONAR_LOGIN
-          debug: true
