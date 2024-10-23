@@ -30,6 +30,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'  # 这里指定Java的分发版本
           java-version: '17'
 
       - name: Run SonarQube Scanner
