@@ -1,5 +1,4 @@
 name: SonarQube CI
-
 on:
   push:
     branches:
@@ -11,28 +10,20 @@ on:
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+        
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Print Environment Variables
-        run: |
-          echo "SONAR_HOST_URL=$SONAR_HOST_URL"
-          echo "SONAR_LOGIN=$SONAR_LOGIN"
-
-      - name: Test SonarQube Connection
-        run: |
-          curl -v http://134.209.105.181:9000
-
       - name: SSH into Kubernetes Node and Run SonarQube Scanner
         uses: appleboy/ssh-action@v0.1.5
+        env:
+          SONAR_HOST_URL: http://134.209.105.18:9000  # 添加端口号
         with:
           host: ${{ secrets.K8S_NODE_IP }}
           username: ${{ secrets.K8S_NODE_USER }}
@@ -40,12 +31,12 @@ jobs:
           script: |
             echo "Running SonarQube Scanner..."
             docker run --rm \
-              -e SONAR_HOST_URL=http://134.209.105.181:9000 \
+              -e SONAR_HOST_URL=${SONAR_HOST_URL} \
               -e SONAR_LOGIN=${{ secrets.SONAR_TOKEN }} \
               -v $(pwd):/usr/src \
               sonarsource/sonar-scanner-cli \
               sonar-scanner -X \
                 -Dsonar.projectKey=my_project \
                 -Dsonar.sources=/usr/src \
-                -Dsonar.host.url=$SONAR_HOST_URL \
-                -Dsonar.login=$SONAR_LOGIN
+                -Dsonar.host.url=${SONAR_HOST_URL} \
+                -Dsonar.login=${{ secrets.SONAR_TOKEN }}
