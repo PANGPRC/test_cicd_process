@@ -22,27 +22,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install kubectl
-        run: |
-          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x ./kubectl
-          sudo mv ./kubectl /usr/local/bin/kubectl
-
-      - name: Set up Kubernetes context
-        uses: azure/k8s-set-context@v1
+      - name: SSH into Kubernetes Node and Run SonarQube Scanner
+        uses: appleboy/ssh-action@v0.1.5
         with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Run SonarQube Scanner in Docker on Kubernetes Node
-        run: |
-          kubectl exec -it pool-intelliedu-2024-wv1a3 -- docker run --rm \
-            -e SONAR_HOST_URL=http://134.209.105.181:9000 \
-            -e SONAR_LOGIN=${{ secrets.SONAR_TOKEN }} \
-            -v $(pwd):/usr/src \
-            sonarsource/sonar-scanner-cli \
-            sonar-scanner \
-              -Dsonar.projectKey=my_project \
-              -Dsonar.sources=/usr/src \
-              -Dsonar.host.url=$SONAR_HOST_URL \
-              -Dsonar.login=$SONAR_LOGIN
+          host: ${{ secrets.K8S_NODE_IP }}
+          username: ${{ secrets.K8S_NODE_USER }}
+          key: ${{ secrets.K8S_NODE_SSH_KEY }}
+          script: |
+            docker run --rm \
+              -e SONAR_HOST_URL=http://localhost:9000 \
+              -e SONAR_LOGIN=${{ secrets.SONAR_TOKEN }} \
+              -v $(pwd):/usr/src \
+              sonarsource/sonar-scanner-cli \
+              sonar-scanner \
+                -Dsonar.projectKey=my_project \
+                -Dsonar.sources=/usr/src \
+                -Dsonar.host.url=$SONAR_HOST_URL \
+                -Dsonar.login=$SONAR_LOGIN
