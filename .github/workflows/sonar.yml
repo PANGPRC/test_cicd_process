@@ -34,7 +34,7 @@ jobs:
               -e SONAR_LOGIN=${{ secrets.SONAR_TOKEN }} \
               -v $(pwd):/usr/src \
               sonarsource/sonar-scanner-cli \
-              sonar-scanner \
+              sonar-scanner -X \
                 -Dsonar.projectKey=my_project \
                 -Dsonar.sources=/usr/src \
                 -Dsonar.host.url=$SONAR_HOST_URL \
